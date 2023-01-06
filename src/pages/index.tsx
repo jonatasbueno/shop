@@ -68,7 +68,10 @@ export const getStaticProps: GetStaticProps = async () => {
       name: product.name,
       imageUrl: product.images[0],
       /** os preços são salvos em centavos (uma boa prática pra evitar problemas de vírgula) */
-      price: price?.unit_amount ? price.unit_amount / 100 : 0
+      price: new Intl.NumberFormat('pr-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      }).format(price?.unit_amount ? price.unit_amount / 100 : 0)
     }
   })
 
