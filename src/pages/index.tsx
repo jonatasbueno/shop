@@ -7,13 +7,12 @@ import Stripe from 'stripe';
 import { stripe } from '../lib/stripe';
 import { HomeContainer, Product } from "../styles/pages/Home";
 
-
 interface HomeProps {
   products: {
     id: string,
     name: string,
     imageUrl: string,
-    price: number
+    price: string
   }[]
 }
 
