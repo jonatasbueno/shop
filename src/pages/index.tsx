@@ -27,7 +27,11 @@ export default function Home({ products }: HomeProps) {
   return (
     <HomeContainer ref={sliderRef} className="keen-slider">
       {products.map(product => (
-        <Link href={`product/${product.id}`} key={product.id}>
+        /** 'prefetch' property é responsável por permitir que o mecanismo do
+         * NextJs pré carregue as páginas antes mesmo de abríla quando true
+         *  (use com cuidado)
+         */
+        <Link href={`product/${product.id}`} key={product.id} prefetch={false}>
           <Product className='keen-slider__slide'>
             <Image src={product.imageUrl} width={520} height={400} alt='' priority />
             <footer>
