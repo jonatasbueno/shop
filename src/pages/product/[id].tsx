@@ -1,7 +1,9 @@
+import axios from "axios";
 import { GetStaticPaths, GetStaticProps } from "next";
+import { useState } from "react";
+import Stripe from "stripe";
 import Image from "next/image"
 import { useRouter } from "next/router";
-import Stripe from "stripe";
 
 import { stripe } from "../../lib/stripe";
 import { ImageContainer, ProductContainer, ProductDetails } from "../../styles/pages/Product";
@@ -12,12 +14,32 @@ interface ProductProps {
     name: string,
     imageUrl: string,
     price: string,
-    description: string
+    description: string,
+    defaultPriceId: string
   }
 }
 
 export default function Product({ product }: ProductProps) {
   const { isFallback } = useRouter();
+  const [isCreatingCheckoutSession, setCreatingCheckoutSession] = useState(false)
+
+  async function handleBuyProduct() {
+    setCreatingCheckoutSession(true)
+
+    try {
+      const response = await axios.post('/api/checkout', {
+        priceId: product.defaultPriceId
+      })
+
+      const { checkoutUrl } = response.data
+
+      window.location.href = checkoutUrl
+    } catch {
+      setCreatingCheckoutSession(false)
+      // Conectar isso a uma ferramenta de observabilidade (Datadog / Sentry)
+      alert('Falha ao redirecionar o checkout!')
+    }
+  }
 
   /** Quando 'getStaticPaths' tem como retorn o param 'fallback' com o valor de 
    * 'true', o hook 'useRouter' terá seu parametro de retorno 'isFallback' como
@@ -39,7 +61,10 @@ export default function Product({ product }: ProductProps) {
         <span>{product.price}</span>
         <p>{product.description}</p>
 
-        <button>Comprar agora</button>
+        <button
+          disabled={isCreatingCheckoutSession}
+          onClick={handleBuyProduct}
+        >Comprar agora</button>
       </ProductDetails>
     </ProductContainer>
   )
@@ -89,7 +114,8 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({ para
           style: 'currency',
           currency: 'BRL',
         }).format(price?.unit_amount ? price.unit_amount / 100 : 0),
-        description: product.description
+        description: product.description,
+        defaultPriceId: price.id
       }
     },
     revalidate: 60 * 60 * 1
