@@ -6,6 +6,7 @@ import Stripe from 'stripe';
 
 import { stripe } from '../lib/stripe';
 import { HomeContainer, Product } from "../styles/pages/Home";
+import Head from 'next/head';
 
 interface HomeProps {
   products: {
@@ -25,24 +26,34 @@ export default function Home({ products }: HomeProps) {
   })
 
   return (
-    <HomeContainer ref={sliderRef} className="keen-slider">
-      {products.map(product => (
-        /** 'prefetch' property é responsável por permitir que o mecanismo do
-         * NextJs pré carregue as páginas antes mesmo de abríla quando true
-         *  (use com cuidado)
-         */
-        <Link href={`product/${product.id}`} key={product.id} prefetch={false}>
-          <Product className='keen-slider__slide'>
-            <Image src={product.imageUrl} width={520} height={400} alt='' priority />
-            <footer>
-              <strong>{product.name}</strong>
-              <span>{product.price}</span>
-            </footer>
-          </Product>
-        </Link>
-      ))}
+    <>
+      {/**
+       * Existe um plugin muito interessante do NextJs chamado 'next-seo'
+       * trazendo diversar features para ti auxiliar no configuração de SEO da 
+       * sua página
+       */}
+      <Head>
+        <title>Home | Shop</title>
+      </Head>
+      <HomeContainer ref={sliderRef} className="keen-slider">
+        {products.map(product => (
+          /** 'prefetch' property é responsável por permitir que o mecanismo do
+           * NextJs pré carregue as páginas antes mesmo de abríla quando true
+           *  (use com cuidado)
+           */
+          <Link href={`product/${product.id}`} key={product.id} prefetch={false}>
+            <Product className='keen-slider__slide'>
+              <Image src={product.imageUrl} width={520} height={400} alt='' priority />
+              <footer>
+                <strong>{product.name}</strong>
+                <span>{product.price}</span>
+              </footer>
+            </Product>
+          </Link>
+        ))}
 
-    </HomeContainer>
+      </HomeContainer>
+    </>
   )
 }
 
